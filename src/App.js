@@ -1,23 +1,44 @@
-import logo from './logo.svg';
+import React, { useEffect,useState } from 'react';
 import './App.css';
+import Navbar from './components/Navbar';
+import List from "./components/List";
+import Todo from "./components/Todo";
+import firebase from "./firebase";
 
 function App() {
+  const [todos,setTodos]=useState([]);
+  useEffect(()=>{
+    const ref=firebase.database().ref("Todo");
+    ref.on('value',(snapshot)=>{
+      const data=snapshot.val();
+      const dataList=[];
+    
+      if(data)
+      {
+        for(let id in data)
+      {
+       dataList.push({id,...data[id]});
+      }
+      setTodos([...dataList]);
+
+      }
+      
+    })
+  },[])
+
   return (
     <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+     
+      <Navbar/>
+      <br/><br/>
+      <Todo/>
+      <hr></hr>
+   
+      {todos.map((todo)=>
+      <List todo={todo} key={todo.id}/>
+      )}
+    
+     
     </div>
   );
 }
